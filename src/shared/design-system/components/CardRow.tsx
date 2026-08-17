@@ -1,7 +1,7 @@
 import { HTMLAttributes, ReactNode } from "react";
 import clsx from "clsx";
 
-interface CardRowProps extends HTMLAttributes<HTMLDivElement> {
+interface CardRowProps extends Omit<HTMLAttributes<HTMLDivElement>, "title"> {
   accentColor?: string;
   leading?: ReactNode;
   title: ReactNode;

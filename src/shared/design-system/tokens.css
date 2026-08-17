@@ -1,0 +1,66 @@
+/**
+ * Clinical Ink — Design Tokens
+ * SINGLE SOURCE OF TRUTH. If you need a color/font not defined here,
+ * add it here first (with a PR both devs review), never inline a
+ * one-off hex value in a module.
+ *
+ * Palette history: Clinical Precision (Stitch) -> soft-violet "HospTal" ->
+ * "Luxurious HMS" 6-color system (2026-08-15, current). Semantic token names
+ * stay stable across repaints so components never need renaming — only the
+ * hex values move. Current mapping: midnight->ink-navy, obsidian->on-surface,
+ * indigoGlow->signal-indigo, royalPurple->signal-indigo-dark,
+ * roseQuartz->pulse-coral, sunsetCoral->sunset-coral (new), mintGlow->vital-green
+ * (unchanged from prior palette), warmSand->paper.
+ */
+:root {
+  --ink-navy: #0F172A;
+  --obsidian: #1E293B;
+  --on-surface: #1E293B;
+  --on-surface-variant: #64748B;
+  --outline: #94A3B8;
+  --outline-variant: #E2E8F0;
+
+  --signal-indigo: #6366F1;
+  --signal-indigo-light: #818CF8;
+  --signal-indigo-dark: #4F46E5;
+  --signal-indigo-tint: #EEF2FF;
+  --pulse-coral: #F43F5E;
+  --sunset-coral: #FB7185;
+  --vital-green: #10B981;
+  --caution-amber: #F59E0B;
+  --paper: #F8FAFC;
+  --line: #F1F5F9;
+  --gradient-brand: linear-gradient(135deg, #6366F1 0%, #4F46E5 50%, #F43F5E 100%);
+
+  --surface-container-lowest: #FFFFFF;
+  --surface-container-low: #F4F4F2;
+  --surface-container: #EEEEEC;
+  --surface-container-high: #E8E8E6;
+  --surface-container-highest: #E2E3E1;
+
+  --module-lab: #0E8974;
+  --module-radiology: #6B4FDD;
+  --module-pharmacy: #B8860B;
+  --module-nursing: #158A72;
+  --module-billing: #0A7A5C;
+  --module-emergency: #FF6A3D;
+  --module-inventory: #2563EB;
+
+  /* Legacy scale — prefer the type-scale tokens below (display-lg, headline-lg, etc.) in new work */
+  --text-display: 34px;
+  --text-h1: 28px;
+  --text-h2: 22px;
+  --text-h3: 17px;
+  --text-body: 15px;
+  --text-caption: 13px;
+
+  --radius-hero: 20px;
+  --radius-card: 12px;
+  --radius-input: 8px;
+}
+
+@layer base {
+  html { font-family: "Poppins", sans-serif; }
+  h1, h2, h3, h4, .font-display { font-family: "Poppins", sans-serif; }
+  .font-mono, .mono { font-family: "JetBrains Mono", monospace; }
+}

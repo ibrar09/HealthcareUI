@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { Maximize2, Clock } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Maximize2, Clock, ChevronRight } from "lucide-react";
+import { ROUTES } from "@/constants/routes";
 import type { DoctorAppointment } from "@modules/doctor-portal/api";
 
 interface OngoingConsultationCardProps {
@@ -12,6 +14,7 @@ const quickTags = ["Prescribed antacids 20mg", "Follow up in 2 weeks", "Vitals s
 
 /** Module-local — the encounter workspace card (spec §5): patient summary, structured detail grid, consultation notes with quick-tag presets, and the finish/save actions. */
 export function OngoingConsultationCard({ patient, onSaveNotes, onFinish }: OngoingConsultationCardProps) {
+  const navigate = useNavigate();
   const [notesText, setNotesText] = useState(patient?.notes ?? "");
 
   useEffect(() => {
@@ -57,6 +60,15 @@ export function OngoingConsultationCard({ patient, onSaveNotes, onFinish }: Ongo
               <span>·</span>
               <span className="font-semibold text-blue-600">{patient.issue}</span>
             </div>
+            {patient.patientId && (
+              <button
+                type="button"
+                onClick={() => navigate(ROUTES.DOCTOR.PATIENT_DETAIL(patient.patientId!))}
+                className="flex items-center gap-0.5 text-[11px] font-semibold text-blue-600 hover:text-blue-700 mt-1"
+              >
+                View Full History <ChevronRight className="w-3 h-3" />
+              </button>
+            )}
           </div>
         </div>
         <div className="flex items-center space-x-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100 text-xs font-semibold text-slate-700">

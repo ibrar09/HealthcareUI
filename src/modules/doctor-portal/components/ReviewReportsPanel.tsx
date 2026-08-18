@@ -1,3 +1,6 @@
+import { ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "@/constants/routes";
 import type { ReviewReport, ReviewReportStatus } from "@modules/doctor-portal/api";
 
 interface ReviewReportsPanelProps {
@@ -14,6 +17,8 @@ const statusStyle: Record<ReviewReportStatus, string> = {
 
 /** Module-local — labs/imaging results awaiting doctor sign-off (spec §14 "the doctor shouldn't need to enter the laboratory module"). */
 export function ReviewReportsPanel({ reports }: ReviewReportsPanelProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm h-full">
       <div className="flex items-center justify-between mb-4">
@@ -35,6 +40,13 @@ export function ReviewReportsPanel({ reports }: ReviewReportsPanelProps) {
                 </div>
                 <p className="text-[11px] font-semibold text-slate-600 mt-0.5">{r.testName}</p>
                 <p className="text-[11px] text-slate-500 mt-1 leading-snug">{r.findings}</p>
+                <button
+                  type="button"
+                  onClick={() => navigate(ROUTES.DOCTOR.PATIENT_DETAIL(r.patientId))}
+                  className="flex items-center gap-0.5 text-[11px] font-semibold text-blue-600 hover:text-blue-700 mt-1.5"
+                >
+                  History <ChevronRight className="w-3 h-3" />
+                </button>
               </div>
             </div>
           </div>

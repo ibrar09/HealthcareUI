@@ -1,4 +1,6 @@
-import { Phone, Mail } from "lucide-react";
+import { Phone, Mail, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "@/constants/routes";
 import type { FollowUpPatient } from "@modules/doctor-portal/api";
 
 interface FollowUpPatientsPanelProps {
@@ -7,6 +9,8 @@ interface FollowUpPatientsPanelProps {
 
 /** Module-local — patients who missed a scheduled follow-up (spec §28 "the system should automatically remind the doctor"). */
 export function FollowUpPatientsPanel({ patients }: FollowUpPatientsPanelProps) {
+  const navigate = useNavigate();
+
   return (
     <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm h-full">
       <div className="flex items-center justify-between mb-4">
@@ -31,13 +35,22 @@ export function FollowUpPatientsPanel({ patients }: FollowUpPatientsPanelProps) 
                   <p className="text-[10px] text-slate-400 mt-0.5">Last due: {p.date}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-3 mt-2 pl-12">
-                <a href={`tel:${p.phone}`} className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:text-blue-700">
-                  <Phone className="w-3 h-3" /> {p.phone}
-                </a>
-                <a href={`mailto:${p.email}`} className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-slate-700 truncate">
-                  <Mail className="w-3 h-3" /> <span className="truncate">{p.email}</span>
-                </a>
+              <div className="flex items-center justify-between gap-3 mt-2 pl-12">
+                <div className="flex items-center gap-3 min-w-0">
+                  <a href={`tel:${p.phone}`} className="flex items-center gap-1 text-[11px] font-semibold text-blue-600 hover:text-blue-700">
+                    <Phone className="w-3 h-3" /> {p.phone}
+                  </a>
+                  <a href={`mailto:${p.email}`} className="flex items-center gap-1 text-[11px] font-semibold text-slate-500 hover:text-slate-700 truncate">
+                    <Mail className="w-3 h-3" /> <span className="truncate">{p.email}</span>
+                  </a>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => navigate(ROUTES.DOCTOR.PATIENT_DETAIL(p.patientId))}
+                  className="flex items-center gap-0.5 text-[11px] font-semibold text-blue-600 hover:text-blue-700 flex-shrink-0"
+                >
+                  History <ChevronRight className="w-3 h-3" />
+                </button>
               </div>
             </div>
           ))

@@ -1,4 +1,6 @@
 import { ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { ROUTES } from "@/constants/routes";
 import type { RosterPatient, RosterStatusTone } from "@modules/doctor-portal/api";
 
 interface PatientRosterListProps {
@@ -13,8 +15,10 @@ const TONE_CLASSES: Record<RosterStatusTone, string> = {
   neutral: "bg-slate-100 text-slate-600 border-slate-200",
 };
 
-/** Module-local — searchable/filterable patient list for the My Patients screen. "View" stays inert until Patient 360 exists. */
+/** Module-local — searchable/filterable patient list for the My Patients screen. "View" opens the patient's full record. */
 export function PatientRosterList({ patients }: PatientRosterListProps) {
+  const navigate = useNavigate();
+
   if (patients.length === 0) {
     return (
       <div className="bg-white rounded-2xl border border-slate-100 p-10 shadow-sm text-center">
@@ -54,8 +58,8 @@ export function PatientRosterList({ patients }: PatientRosterListProps) {
 
           <button
             type="button"
+            onClick={() => navigate(ROUTES.DOCTOR.PATIENT_DETAIL(p.id))}
             className="flex items-center gap-0.5 text-xs font-semibold text-blue-600 hover:text-blue-700 flex-shrink-0"
-            title="Patient 360 view is coming soon"
           >
             View <ChevronRight className="w-3.5 h-3.5" />
           </button>

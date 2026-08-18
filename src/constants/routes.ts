@@ -8,6 +8,7 @@ export const ROUTES = {
     SIGN_IN: "/doctor/sign-in",
     DASHBOARD: "/doctor/dashboard",
     PATIENTS: "/doctor/patients",
+    PATIENT_DETAIL: (id: string) => `/doctor/patients/${id}`,
   },
   HOSPITAL_ADMIN: {
     SIGN_IN: "/hospital-admin/sign-in",

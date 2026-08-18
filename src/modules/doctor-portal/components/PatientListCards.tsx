@@ -8,6 +8,7 @@ import type { ClinicalStatus, RosterPatient } from "@modules/doctor-portal/api";
 interface PatientListCardsProps {
   patients: RosterPatient[];
   groupBy: "none" | "department" | "location";
+  onSelectPatient: (patientId: string) => void;
 }
 
 const CLINICAL_STATUS_DOT: Record<ClinicalStatus, string> = {
@@ -28,7 +29,7 @@ function groupKey(p: RosterPatient, groupBy: "none" | "department" | "location")
 }
 
 /** Module-local — card-layout variant of the My Patients list, same data as the table, better suited to tablets. */
-export function PatientListCards({ patients, groupBy }: PatientListCardsProps) {
+export function PatientListCards({ patients, groupBy, onSelectPatient }: PatientListCardsProps) {
   const navigate = useNavigate();
 
   if (patients.length === 0) {
@@ -63,7 +64,15 @@ export function PatientListCards({ patients, groupBy }: PatientListCardsProps) {
           )}
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
             {groupPatients.map((p) => (
-              <div key={p.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col gap-3">
+              <div
+                key={p.id}
+                onClick={() => onSelectPatient(p.id)}
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelectPatient(p.id); } }}
+                tabIndex={0}
+                role="button"
+                aria-label={`View quick summary for ${p.name}`}
+                className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-col gap-3 cursor-pointer hover:shadow-md transition-shadow focus:outline-none focus:ring-2 focus:ring-blue-200"
+              >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-start gap-2.5 min-w-0">
                     <img src={p.avatar} alt={p.name} className="w-11 h-11 rounded-full object-cover border border-slate-200 flex-shrink-0" />
@@ -130,7 +139,7 @@ export function PatientListCards({ patients, groupBy }: PatientListCardsProps) {
                   <span>{p.nextAppointment ? `Next: ${p.nextAppointment}` : "No follow-up scheduled"}</span>
                 </div>
 
-                <div className="flex items-center gap-2 pt-1">
+                <div className="flex items-center gap-2 pt-1" onClick={(e) => e.stopPropagation()}>
                   <button
                     type="button"
                     onClick={() => navigate(ROUTES.DOCTOR.PATIENT_DETAIL(p.id))}

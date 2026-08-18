@@ -7,6 +7,7 @@ import { PatientFiltersPanel, EMPTY_FILTERS, type PatientListFilters } from "@mo
 import { PatientColumnsMenu, DEFAULT_COLUMNS, type ColumnKey } from "@modules/doctor-portal/components/PatientColumnsMenu";
 import { PatientRosterList } from "@modules/doctor-portal/components/PatientRosterList";
 import { PatientListCards } from "@modules/doctor-portal/components/PatientListCards";
+import { PatientQuickView } from "@modules/doctor-portal/components/PatientQuickView";
 import * as api from "@modules/doctor-portal/api";
 import type { RosterPatient, SmartViewKey } from "@modules/doctor-portal/api";
 
@@ -70,6 +71,7 @@ export function MyPatients() {
   const [columnsOpen, setColumnsOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"table" | "card">("table");
   const [groupBy, setGroupBy] = useState<"none" | "department" | "location">("none");
+  const [quickViewPatientId, setQuickViewPatientId] = useState<string | null>(null);
 
   useEffect(() => {
     api.getPatientRoster().then(setRoster);
@@ -148,10 +150,12 @@ export function MyPatients() {
       {columnsOpen && <PatientColumnsMenu columns={columns} onChange={setColumns} />}
 
       {viewMode === "table" ? (
-        <PatientRosterList patients={filtered} columns={columns} groupBy={groupBy} />
+        <PatientRosterList patients={filtered} columns={columns} groupBy={groupBy} onSelectPatient={setQuickViewPatientId} />
       ) : (
-        <PatientListCards patients={filtered} groupBy={groupBy} />
+        <PatientListCards patients={filtered} groupBy={groupBy} onSelectPatient={setQuickViewPatientId} />
       )}
+
+      <PatientQuickView patientId={quickViewPatientId} onClose={() => setQuickViewPatientId(null)} />
     </DoctorLayout>
   );
 }

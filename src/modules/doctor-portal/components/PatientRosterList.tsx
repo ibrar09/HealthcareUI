@@ -10,6 +10,7 @@ interface PatientRosterListProps {
   patients: RosterPatient[];
   columns: Record<ColumnKey, boolean>;
   groupBy: "none" | "department" | "location";
+  onSelectPatient: (patientId: string) => void;
 }
 
 const CLINICAL_STATUS_DOT: Record<ClinicalStatus, string> = {
@@ -30,7 +31,7 @@ function groupKey(p: RosterPatient, groupBy: "none" | "department" | "location")
 }
 
 /** Module-local — the full My Patients table: identity, encounter, diagnosis, allergy, vitals, results, pending, last/next visit, all column-configurable and optionally grouped. */
-export function PatientRosterList({ patients, columns, groupBy }: PatientRosterListProps) {
+export function PatientRosterList({ patients, columns, groupBy, onSelectPatient }: PatientRosterListProps) {
   const navigate = useNavigate();
 
   if (patients.length === 0) {
@@ -84,7 +85,15 @@ export function PatientRosterList({ patients, columns, groupBy }: PatientRosterL
                 </tr>
               )}
               {groupPatients.map((p) => (
-                <tr key={p.id} className="border-b border-slate-50 hover:bg-slate-50/60 transition-colors align-top">
+                <tr
+                  key={p.id}
+                  onClick={() => onSelectPatient(p.id)}
+                  onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSelectPatient(p.id); } }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`View quick summary for ${p.name}`}
+                  className="border-b border-slate-50 hover:bg-slate-50/60 transition-colors align-top cursor-pointer focus:outline-none focus:bg-blue-50/40"
+                >
                   <td className="px-4 py-3.5">
                     <div className="flex items-start gap-3">
                       <img src={p.avatar} alt={p.name} className="w-10 h-10 rounded-full object-cover border border-slate-200 flex-shrink-0" />
@@ -186,7 +195,7 @@ export function PatientRosterList({ patients, columns, groupBy }: PatientRosterL
                   {columns.phone && <td className="px-3 py-3.5 text-[11px] text-slate-600 whitespace-nowrap">{p.phone}</td>}
                   {columns.location && <td className="px-3 py-3.5 text-[11px] text-slate-600 whitespace-nowrap">{p.location}</td>}
 
-                  <td className="px-3 py-3.5">
+                  <td className="px-3 py-3.5" onClick={(e) => e.stopPropagation()}>
                     <div className="flex items-center justify-end gap-1.5">
                       <button
                         type="button"

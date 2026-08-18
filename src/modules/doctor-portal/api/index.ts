@@ -5,6 +5,7 @@ import type { Patient, Doctor } from "@shared/types/domain";
 // from here, type-only, so this re-export doesn't create a runtime cycle —
 // see that file's own header comment for why it's a separate dataset).
 export * from "./appointments";
+export * from "./schedule";
 
 // Module-local sample data — only Doctor Portal screens use this file.
 // Patient identities/geography/MRN format deliberately match Hospital

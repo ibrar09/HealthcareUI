@@ -5,6 +5,7 @@ import { MyPatients } from "./pages/MyPatients";
 import { PatientDetail } from "./pages/PatientDetail";
 import { EncounterWorkspace } from "./pages/EncounterWorkspace";
 import { Appointments } from "./pages/Appointments";
+import { Schedule } from "./pages/Schedule";
 
 /**
  * This module's own routes, registered under /doctor/* in the root router.
@@ -20,5 +21,6 @@ export const doctorPortalRoutes: RouteObject[] = [
   { path: "patients/:id", element: <PatientDetail /> },
   { path: "encounter/:patientId", element: <EncounterWorkspace /> },
   { path: "appointments", element: <Appointments /> },
+  { path: "schedule", element: <Schedule /> },
   // ...add remaining Doctor Portal screens here as built
 ];

@@ -1,7 +1,12 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { AlertTriangle } from "lucide-react";
 import { AppointmentModalShell } from "@modules/doctor-portal/components/AppointmentModalShell";
 import { formatDisplayDate, formatTime12h } from "@modules/doctor-portal/components/SlotPickerModal";
-import type { EncounterType, VisitType, AppointmentPriority, NewAppointmentInput, RosterPatient } from "@modules/doctor-portal/api";
+import * as api from "@modules/doctor-portal/api";
+import type {
+  EncounterType, VisitType, AppointmentPriority, NewAppointmentInput, RosterPatient,
+  DayHours, BlockedTime, SlotDurationConfig,
+} from "@modules/doctor-portal/api";
 
 interface BookAppointmentModalProps {
   roster: RosterPatient[];
@@ -32,6 +37,32 @@ export function BookAppointmentModal({ roster, defaultDate, onClose, onConfirm }
   const [isNewPatient, setIsNewPatient] = useState(false);
   const [priority, setPriority] = useState<AppointmentPriority>("Routine");
   const [reason, setReason] = useState("");
+
+  const [workingHours, setWorkingHours] = useState<DayHours[]>([]);
+  const [blockedTimes, setBlockedTimes] = useState<BlockedTime[]>([]);
+  const [slotDurations, setSlotDurations] = useState<SlotDurationConfig[]>([]);
+
+  useEffect(() => {
+    api.getWorkingHours().then(setWorkingHours);
+    api.getBlockedTimes().then(setBlockedTimes);
+    api.getSlotDurations().then((configs) => {
+      setSlotDurations(configs);
+      const initial = configs.find((s) => s.visitType === visitType);
+      if (initial) setDuration(initial.minutes);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function handleVisitTypeChange(next: VisitType) {
+    setVisitType(next);
+    const config = slotDurations.find((s) => s.visitType === next);
+    if (config) setDuration(config.minutes);
+  }
+
+  const scheduleWarnings = useMemo(
+    () => (date && time && workingHours.length > 0 ? api.checkSlotAgainstSchedule(workingHours, blockedTimes, date, time) : []),
+    [date, time, workingHours, blockedTimes]
+  );
 
   const canBook = Boolean(patientId && date && time && reason.trim());
 
@@ -100,11 +131,23 @@ export function BookAppointmentModal({ roster, defaultDate, onClose, onConfirm }
           </div>
           <div>
             <label className="block text-xs font-semibold text-slate-600 mb-1">Visit Type</label>
-            <select value={visitType} onChange={(e) => setVisitType(e.target.value as VisitType)} className={inputClass}>
+            <select value={visitType} onChange={(e) => handleVisitTypeChange(e.target.value as VisitType)} className={inputClass}>
               {VISIT_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
           </div>
         </div>
+
+        {scheduleWarnings.length > 0 && (
+          <div className="flex items-start gap-2 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2.5">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              {scheduleWarnings.map((w) => (
+                <p key={w} className="text-[11px] font-medium text-amber-700">{w}</p>
+              ))}
+              <p className="text-[11px] text-amber-600 mt-0.5">You can still book this as an exception.</p>
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-2 gap-3">
           <div>

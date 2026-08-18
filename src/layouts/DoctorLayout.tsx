@@ -39,7 +39,7 @@ export function DoctorLayout({ active, children }: DoctorLayoutProps) {
     { label: "Messages", icon: <MessageSquare size={18} />, active: active === "Messages", badge: unreadMessages || undefined, onClick: () => navigate(ROUTES.DOCTOR.MESSAGES) },
     { label: "Patients", icon: <Users size={18} />, active: active === "Patients", onClick: () => navigate(ROUTES.DOCTOR.PATIENTS) },
     { label: "Schedules", icon: <Clock size={18} />, active: active === "Schedules", onClick: () => navigate(ROUTES.DOCTOR.SCHEDULE) },
-    { label: "Payment", icon: <CreditCard size={18} />, active: active === "Payment" },
+    { label: "Payment", icon: <CreditCard size={18} />, active: active === "Payment", onClick: () => navigate(ROUTES.DOCTOR.PAYMENT) },
     { label: "Product & Stock", icon: <Package size={18} />, active: active === "Product & Stock" },
     { label: "Help Center", icon: <HelpCircle size={18} />, active: active === "Help Center" },
     { label: "Settings", icon: <Settings size={18} />, active: active === "Settings" },

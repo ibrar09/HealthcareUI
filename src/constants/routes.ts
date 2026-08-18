@@ -13,6 +13,7 @@ export const ROUTES = {
     APPOINTMENTS: "/doctor/appointments",
     QUEUE: "/doctor/queue",
     REQUESTS: "/doctor/requests",
+    PAYMENT: "/doctor/payment",
     SCHEDULE: "/doctor/schedule",
     MESSAGES: "/doctor/messages",
   },

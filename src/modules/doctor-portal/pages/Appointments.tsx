@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, ListChecks } from "lucide-react";
 import { DoctorLayout } from "@/layouts/DoctorLayout";
 import { ROUTES } from "@/constants/routes";
 import { AppointmentDashboardStats } from "@modules/doctor-portal/components/AppointmentDashboardStats";
@@ -123,13 +123,22 @@ export function Appointments() {
     <DoctorLayout active="Appointments">
       <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
         <h1 className="text-xl font-bold text-slate-800">Appointments</h1>
-        <button
-          type="button"
-          onClick={() => setBookModalOpen(true)}
-          className="flex items-center gap-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl px-4 py-2.5 shadow-sm shadow-blue-500/30"
-        >
-          <Plus className="w-3.5 h-3.5" /> Book Appointment
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => navigate(ROUTES.DOCTOR.QUEUE)}
+            className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl px-4 py-2.5"
+          >
+            <ListChecks className="w-3.5 h-3.5" /> Queue View
+          </button>
+          <button
+            type="button"
+            onClick={() => setBookModalOpen(true)}
+            className="flex items-center gap-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl px-4 py-2.5 shadow-sm shadow-blue-500/30"
+          >
+            <Plus className="w-3.5 h-3.5" /> Book Appointment
+          </button>
+        </div>
       </div>
 
       <AppointmentDashboardStats summary={summary} />

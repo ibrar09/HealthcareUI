@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, ListChecks } from "lucide-react";
+import { Plus, ListChecks, LayoutList, CalendarRange } from "lucide-react";
 import { DoctorLayout } from "@/layouts/DoctorLayout";
 import { ROUTES } from "@/constants/routes";
 import { AppointmentDashboardStats } from "@modules/doctor-portal/components/AppointmentDashboardStats";
@@ -12,6 +12,9 @@ import { AppointmentDetailsPanel } from "@modules/doctor-portal/components/Appoi
 import { SlotPickerModal, formatDisplayDate } from "@modules/doctor-portal/components/SlotPickerModal";
 import { CancelAppointmentModal } from "@modules/doctor-portal/components/CancelAppointmentModal";
 import { BookAppointmentModal } from "@modules/doctor-portal/components/BookAppointmentModal";
+import { CalendarNav, type CalendarGranularity } from "@modules/doctor-portal/components/CalendarNav";
+import { MonthCalendar, monthLabel } from "@modules/doctor-portal/components/MonthCalendar";
+import { WeekCalendar, weekLabel } from "@modules/doctor-portal/components/WeekCalendar";
 import * as api from "@modules/doctor-portal/api";
 import type { Appointment, AppointmentSummary, EncounterType, RosterPatient } from "@modules/doctor-portal/api";
 
@@ -47,6 +50,10 @@ export function Appointments() {
   const [selectedDate, setSelectedDate] = useState(api.TODAY_ISO);
   const [dayAppointments, setDayAppointments] = useState<Appointment[]>([]);
   const [todaysAppointments, setTodaysAppointments] = useState<Appointment[]>([]);
+  const [allAppointments, setAllAppointments] = useState<Appointment[]>([]);
+
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
+  const [calendarGranularity, setCalendarGranularity] = useState<CalendarGranularity>("month");
 
   const [search, setSearch] = useState("");
   const [statusChip, setStatusChip] = useState<AppointmentStatusFilterKey>("all");
@@ -67,10 +74,14 @@ export function Appointments() {
   function refreshToday() {
     api.getAppointmentsByDate(api.TODAY_ISO).then(setTodaysAppointments);
   }
+  function refreshCalendar() {
+    api.getAppointments().then(setAllAppointments);
+  }
   function refreshAll() {
     refreshDay();
     refreshSummary();
     refreshToday();
+    refreshCalendar();
   }
 
   useEffect(() => {
@@ -78,6 +89,7 @@ export function Appointments() {
     api.getCurrentDoctor().then((d) => setDoctorName(d.name));
     refreshSummary();
     refreshToday();
+    refreshCalendar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -109,7 +121,7 @@ export function Appointments() {
     });
   }, [dayAppointments, statusChip, typeFilter, search, roster]);
 
-  const detailsAppointment = dayAppointments.find((a) => a.id === detailsAppointmentId) ?? null;
+  const detailsAppointment = allAppointments.find((a) => a.id === detailsAppointmentId) ?? dayAppointments.find((a) => a.id === detailsAppointmentId) ?? null;
   const detailsPatient = detailsAppointment ? roster.find((p) => p.id === detailsAppointment.patientId) ?? null : null;
 
   function handleStartEncounter(appt: Appointment) {
@@ -146,33 +158,81 @@ export function Appointments() {
       <ClinicalBrief doctorName={doctorName} todaysAppointments={todaysAppointments} roster={roster} />
 
       <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
-        <AppointmentDateNav date={selectedDate} onDateChange={setSelectedDate} label={dateLabel} />
+        {viewMode === "list" ? (
+          <AppointmentDateNav date={selectedDate} onDateChange={setSelectedDate} label={dateLabel} />
+        ) : (
+          <CalendarNav
+            granularity={calendarGranularity}
+            onGranularityChange={setCalendarGranularity}
+            referenceDate={selectedDate}
+            onReferenceDateChange={setSelectedDate}
+            label={calendarGranularity === "month" ? monthLabel(selectedDate) : weekLabel(selectedDate)}
+          />
+        )}
+
+        <div className="flex items-center rounded-lg border border-slate-200 overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setViewMode("list")}
+            aria-label="List view"
+            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold ${viewMode === "list" ? "bg-blue-600 text-white" : "bg-white text-slate-500 hover:bg-slate-50"}`}
+          >
+            <LayoutList className="w-3.5 h-3.5" /> List
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode("calendar")}
+            aria-label="Calendar view"
+            className={`flex items-center gap-1.5 px-3 py-2 text-xs font-semibold ${viewMode === "calendar" ? "bg-blue-600 text-white" : "bg-white text-slate-500 hover:bg-slate-50"}`}
+          >
+            <CalendarRange className="w-3.5 h-3.5" /> Calendar
+          </button>
+        </div>
       </div>
 
-      <AppointmentFilters
-        search={search}
-        onSearchChange={setSearch}
-        chips={chips}
-        activeChip={statusChip}
-        onChipChange={setStatusChip}
-        typeFilter={typeFilter}
-        onTypeFilterChange={setTypeFilter}
-      />
+      {viewMode === "list" ? (
+        <>
+          <AppointmentFilters
+            search={search}
+            onSearchChange={setSearch}
+            chips={chips}
+            activeChip={statusChip}
+            onChipChange={setStatusChip}
+            typeFilter={typeFilter}
+            onTypeFilterChange={setTypeFilter}
+          />
 
-      <AppointmentList
-        appointments={filtered}
-        roster={roster}
-        onOpenDetails={setDetailsAppointmentId}
-        onCheckIn={(id) => api.updateAppointmentStatus(id, "Checked-in").then(() => refreshAll())}
-        onMarkWaiting={(id) => api.updateAppointmentStatus(id, "Waiting").then(() => refreshAll())}
-        onStartEncounter={handleStartEncounter}
-        onReschedule={setRescheduleTarget}
-        onCancel={(appt) => setCancelTarget({ appt, mode: "cancel" })}
-        onMarkNoShow={(id) => api.updateAppointmentStatus(id, "No-show").then(() => refreshAll())}
-        onAccept={setAcceptTarget}
-        onDecline={(appt) => setCancelTarget({ appt, mode: "decline" })}
-        onMarkCompleted={(id) => api.updateAppointmentStatus(id, "Completed").then(() => refreshAll())}
-      />
+          <AppointmentList
+            appointments={filtered}
+            roster={roster}
+            onOpenDetails={setDetailsAppointmentId}
+            onCheckIn={(id) => api.updateAppointmentStatus(id, "Checked-in").then(() => refreshAll())}
+            onMarkWaiting={(id) => api.updateAppointmentStatus(id, "Waiting").then(() => refreshAll())}
+            onStartEncounter={handleStartEncounter}
+            onReschedule={setRescheduleTarget}
+            onCancel={(appt) => setCancelTarget({ appt, mode: "cancel" })}
+            onMarkNoShow={(id) => api.updateAppointmentStatus(id, "No-show").then(() => refreshAll())}
+            onAccept={setAcceptTarget}
+            onDecline={(appt) => setCancelTarget({ appt, mode: "decline" })}
+            onMarkCompleted={(id) => api.updateAppointmentStatus(id, "Completed").then(() => refreshAll())}
+          />
+        </>
+      ) : calendarGranularity === "month" ? (
+        <MonthCalendar
+          referenceDate={selectedDate}
+          appointments={allAppointments}
+          todayIso={api.TODAY_ISO}
+          onSelectDay={(iso) => { setSelectedDate(iso); setViewMode("list"); }}
+        />
+      ) : (
+        <WeekCalendar
+          referenceDate={selectedDate}
+          appointments={allAppointments}
+          roster={roster}
+          todayIso={api.TODAY_ISO}
+          onSelectAppointment={setDetailsAppointmentId}
+        />
+      )}
 
       <AppointmentDetailsPanel
         appointment={detailsAppointment}

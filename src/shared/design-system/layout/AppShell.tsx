@@ -328,7 +328,8 @@ function RailShell({
             </button>
             <button
               type="button"
-              className="ml-2 flex items-center gap-2 text-white pl-1.5 pr-4 py-1.5 rounded-full transition-all shadow-md bg-gradient-brand"
+              className="ml-2 flex items-center gap-2 text-white pl-1.5 pr-4 py-1.5 rounded-full transition-all shadow-md"
+              style={{ backgroundImage: `linear-gradient(135deg, ${accentColor}, color-mix(in srgb, ${accentColor} 60%, black))` }}
             >
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-xs font-bold">
                 {userName

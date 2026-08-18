@@ -16,6 +16,7 @@ export const ROUTES = {
     PAYMENT: "/doctor/payment",
     PRODUCT_STOCK: "/doctor/product-stock",
     HELP_CENTER: "/doctor/help-center",
+    SETTINGS: "/doctor/settings",
     SCHEDULE: "/doctor/schedule",
     MESSAGES: "/doctor/messages",
   },

@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Stethoscope, LayoutGrid, CalendarDays, MessageSquare, Users, Clock,
@@ -7,6 +7,7 @@ import {
 import { AppShell } from "@shared/design-system/layout/AppShell";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/constants/routes";
+import * as api from "@modules/doctor-portal/api";
 
 interface DoctorLayoutProps {
   active: string; // which nav item is active, e.g. "Overview"
@@ -26,11 +27,16 @@ interface DoctorLayoutProps {
 export function DoctorLayout({ active, children }: DoctorLayoutProps) {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [unreadMessages, setUnreadMessages] = useState(0);
+
+  useEffect(() => {
+    api.getUnreadCount().then(setUnreadMessages);
+  }, [active]);
 
   const navItems = [
     { label: "Overview", icon: <LayoutGrid size={18} />, active: active === "Overview", onClick: () => navigate(ROUTES.DOCTOR.DASHBOARD) },
     { label: "Appointments", icon: <CalendarDays size={18} />, active: active === "Appointments", onClick: () => navigate(ROUTES.DOCTOR.APPOINTMENTS) },
-    { label: "Messages", icon: <MessageSquare size={18} />, active: active === "Messages", badge: 3 },
+    { label: "Messages", icon: <MessageSquare size={18} />, active: active === "Messages", badge: unreadMessages || undefined, onClick: () => navigate(ROUTES.DOCTOR.MESSAGES) },
     { label: "Patients", icon: <Users size={18} />, active: active === "Patients", onClick: () => navigate(ROUTES.DOCTOR.PATIENTS) },
     { label: "Schedules", icon: <Clock size={18} />, active: active === "Schedules", onClick: () => navigate(ROUTES.DOCTOR.SCHEDULE) },
     { label: "Payment", icon: <CreditCard size={18} />, active: active === "Payment" },

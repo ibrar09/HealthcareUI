@@ -1,6 +1,7 @@
 import { RouteObject } from "react-router-dom";
 import { DoctorSignIn } from "./pages/DoctorSignIn";
 import { DoctorDashboard } from "./pages/DoctorDashboard";
+import { MyPatients } from "./pages/MyPatients";
 
 /**
  * This module's own routes, registered under /doctor/* in the root router.
@@ -12,7 +13,7 @@ import { DoctorDashboard } from "./pages/DoctorDashboard";
 export const doctorPortalRoutes: RouteObject[] = [
   { path: "sign-in", element: <DoctorSignIn /> },
   { path: "dashboard", element: <DoctorDashboard /> },
-  // { path: "patients", element: <PatientSearch /> },
+  { path: "patients", element: <MyPatients /> },
   // { path: "patients/:id", element: <PatientChartOverview /> },
   // { path: "encounter/:id", element: <EncounterWorkspace /> },
   // ...add remaining Doctor Portal screens here as built

@@ -7,6 +7,7 @@ export const ROUTES = {
   DOCTOR: {
     SIGN_IN: "/doctor/sign-in",
     DASHBOARD: "/doctor/dashboard",
+    PATIENTS: "/doctor/patients",
   },
   HOSPITAL_ADMIN: {
     SIGN_IN: "/hospital-admin/sign-in",

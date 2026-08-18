@@ -194,6 +194,138 @@ const reviewReports: ReviewReport[] = [
   },
 ];
 
+// --- My Patients roster (full panel list, search + filter chips) -----------
+
+export type PatientRosterCategory = "today" | "follow-up-due" | "ipd" | "emergency" | "chronic-care" | "high-risk";
+export type RosterStatusTone = "success" | "warning" | "critical" | "info" | "neutral";
+
+export interface RosterPatient {
+  id: string;
+  name: string;
+  avatar: string;
+  age: number;
+  gender: "Male" | "Female";
+  dob: string;
+  mrn: string;
+  phone: string;
+  conditions: string[];
+  lastVisit: string;
+  status: string;
+  statusTone: RosterStatusTone;
+  categories: PatientRosterCategory[];
+}
+
+const patientRoster: RosterPatient[] = [
+  {
+    id: "rp-1", name: "Ibrar Ahmad", age: 31, gender: "Male", dob: "14 Mar 1995",
+    avatar: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-004417", phone: "+92 300 4417220", conditions: ["GERD"],
+    lastVisit: "Today, 08:00", status: "Stable", statusTone: "success", categories: ["today"],
+  },
+  {
+    id: "rp-2", name: "Fatima Sheikh", age: 35, gender: "Female", dob: "02 Jun 1991",
+    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-004892", phone: "+92 301 4892110", conditions: ["Migraine"],
+    lastVisit: "Today, 09:00", status: "Stable", statusTone: "success", categories: ["today", "chronic-care"],
+  },
+  {
+    id: "rp-3", name: "Zara Malik", age: 41, gender: "Female", dob: "27 Nov 1984",
+    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-005103", phone: "+92 302 5103998", conditions: ["GERD"],
+    lastVisit: "Today, 10:00", status: "Stable", statusTone: "success", categories: ["today"],
+  },
+  {
+    id: "rp-4", name: "Ahsan Tariq", age: 29, gender: "Male", dob: "19 Feb 1997",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-003318", phone: "+92 303 3318775", conditions: ["CKD Stage 3"],
+    lastVisit: "Today, 11:00", status: "On Consultation", statusTone: "info",
+    categories: ["today", "chronic-care", "high-risk"],
+  },
+  {
+    id: "rp-5", name: "Bilal Hussain", age: 45, gender: "Male", dob: "05 Sep 1980",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-006220", phone: "+92 304 6220441", conditions: ["Stomach Pain"],
+    lastVisit: "Today, 13:00", status: "Upcoming", statusTone: "neutral", categories: ["today"],
+  },
+  {
+    id: "rp-6", name: "Kamal Siddiqui", age: 38, gender: "Male", dob: "23 Jan 1988",
+    avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-004430", phone: "+92 305 4430229", conditions: ["Post-Concussion"],
+    lastVisit: "Today, 14:00", status: "Upcoming", statusTone: "neutral", categories: ["today"],
+  },
+  {
+    id: "rp-7", name: "Noor Fatima", age: 31, gender: "Female", dob: "11 Jul 1995",
+    avatar: "https://images.unsplash.com/photo-1601412436009-d964bd02edbc?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-005567", phone: "+92 306 5567113", conditions: ["Tension Headache"],
+    lastVisit: "Today, 15:00", status: "Upcoming", statusTone: "neutral", categories: ["today"],
+  },
+  {
+    id: "rp-8", name: "Hamza Butt", age: 71, gender: "Male", dob: "08 Apr 1955",
+    avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-007741", phone: "+92 300 1122334", conditions: ["Diabetes"],
+    lastVisit: "Jul 29, 2026", status: "Follow-Up Due", statusTone: "warning",
+    categories: ["follow-up-due", "chronic-care"],
+  },
+  {
+    id: "rp-9", name: "Saira Cheema", age: 52, gender: "Female", dob: "16 Dec 1973",
+    avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-007902", phone: "+92 301 5566778", conditions: ["Hypertensive Crisis"],
+    lastVisit: "Aug 25, 2026", status: "Emergency Admit", statusTone: "critical",
+    categories: ["emergency", "high-risk"],
+  },
+  {
+    id: "rp-10", name: "Omar Sethi", age: 58, gender: "Male", dob: "30 Aug 1967",
+    avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-008015", phone: "+92 302 9988776", conditions: ["CKD Stage 3"],
+    lastVisit: "Jul 30, 2026", status: "Follow-Up Due", statusTone: "warning",
+    categories: ["follow-up-due", "chronic-care", "high-risk"],
+  },
+  {
+    id: "rp-11", name: "Layla Awan", age: 44, gender: "Female", dob: "21 May 1981",
+    avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-008220", phone: "+92 303 7743311", conditions: ["Hyperlipidemia"],
+    lastVisit: "Aug 12, 2026", status: "Follow-Up Due", statusTone: "warning",
+    categories: ["follow-up-due", "chronic-care"],
+  },
+  {
+    id: "rp-12", name: "Rashid Qureshi", age: 36, gender: "Male", dob: "03 Oct 1989",
+    avatar: "https://images.unsplash.com/photo-1615109398623-88346a601842?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-008349", phone: "+92 304 8812256", conditions: ["Post-Imaging Review"],
+    lastVisit: "Aug 10, 2026", status: "Stable", statusTone: "success", categories: [],
+  },
+  {
+    id: "rp-13", name: "Amina Siddiqui", age: 29, gender: "Female", dob: "17 Feb 1997",
+    avatar: "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-008477", phone: "+92 305 3345567", conditions: ["Hypothyroidism"],
+    lastVisit: "Aug 08, 2026", status: "Stable", statusTone: "success", categories: ["chronic-care"],
+  },
+  {
+    id: "rp-14", name: "Mariam Farooq", age: 47, gender: "Female", dob: "09 Sep 1978",
+    avatar: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-008590", phone: "+92 306 6654432", conditions: ["Fatty Liver Grade 1"],
+    lastVisit: "Aug 05, 2026", status: "Follow-Up Due", statusTone: "warning", categories: ["follow-up-due"],
+  },
+  {
+    id: "rp-15", name: "Hassan Abbasi", age: 62, gender: "Male", dob: "25 Jun 1963",
+    avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-008711", phone: "+92 300 9987654", conditions: ["Diabetes", "HbA1c Elevated"],
+    lastVisit: "Aug 02, 2026", status: "High-Risk", statusTone: "critical",
+    categories: ["chronic-care", "high-risk"],
+  },
+  {
+    id: "rp-16", name: "Elena Rodriguez", age: 39, gender: "Female", dob: "14 Jan 1987",
+    avatar: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-008856", phone: "+92 301 2247890", conditions: ["Post-Cardiac Admission"],
+    lastVisit: "Admitted Aug 15, 2026", status: "IPD · Ward 3B", statusTone: "info", categories: ["ipd"],
+  },
+  {
+    id: "rp-17", name: "Usman Khan", age: 55, gender: "Male", dob: "11 Nov 1970",
+    avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80",
+    mrn: "MRN-2026-008902", phone: "+92 302 8834521", conditions: ["Post-Operative Recovery"],
+    lastVisit: "Admitted Aug 16, 2026", status: "IPD · Post-Op", statusTone: "info", categories: ["ipd"],
+  },
+];
+
 // --- Summary cards (spec §1 KPI row) ----------------------------------------
 
 export interface SummaryCardData {
@@ -231,6 +363,7 @@ export const getFollowUpPatients = () => mockRequest(followUpPatients);
 export const getReviewReports = () => mockRequest(reviewReports);
 export const getSummaryCards = () => mockRequest(summaryCards);
 export const getAttendedProgress = () => mockRequest(attendedProgress);
+export const getPatientRoster = () => mockRequest(patientRoster);
 
 export function saveConsultationNotes(appointmentId: string, notes: string) {
   const appt = doctorAppointments.find((a) => a.id === appointmentId);

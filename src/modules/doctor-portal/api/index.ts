@@ -199,8 +199,42 @@ const reviewReports: ReviewReport[] = [
 
 // --- My Patients roster (full panel list, search + filter chips) -----------
 
-export type PatientRosterCategory = "today" | "follow-up-due" | "ipd" | "emergency" | "chronic-care" | "high-risk";
 export type RosterStatusTone = "success" | "warning" | "critical" | "info" | "neutral";
+
+// Visit type (how the doctor is currently engaging the patient) and
+// clinical status (acuity) are two different axes — a patient can be an
+// "OPD" encounter that's clinically "Critical", so they're kept separate
+// rather than one combined status string.
+export type EncounterType = "OPD" | "IPD" | "Emergency" | "Telemedicine" | "Follow-up";
+export type ClinicalStatus = "Stable" | "Attention" | "High Risk" | "Critical" | "Follow-up";
+export type LocationType = "My Clinic" | "Ward" | "ICU" | "Emergency" | "Other Facility";
+export type ResultFlag = "critical" | "abnormal" | "normal";
+export type PendingUrgency = "critical" | "abnormal" | "routine";
+// Distinguishes the doctor's relationship to the patient — never "doctor
+// can see every patient in the hospital." Real enforcement of this is a
+// backend/consent concern (see CLAUDE.md §3); this tag only drives what
+// the UI displays, not actual access control.
+export type PatientOwnership = "My Patients" | "Care Team" | "Department" | "Shared" | "Consulted";
+
+export type SmartViewKey = "all" | "today" | "active" | "opd" | "ipd" | "emergency" | "critical" | "follow-up" | "pending-results";
+
+export interface PatientVitals {
+  bp?: string;
+  hr?: number;
+  spo2?: number;
+  temp?: number;
+}
+
+export interface PatientRecentResult {
+  name: string;
+  value: string;
+  flag: ResultFlag;
+}
+
+export interface PatientPendingItem {
+  label: string;
+  urgency: PendingUrgency;
+}
 
 export interface RosterPatient {
   id: string;
@@ -210,122 +244,210 @@ export interface RosterPatient {
   gender: "Male" | "Female";
   dob: string;
   mrn: string;
+  patientIdCode: string;
+  encounterNumber?: string;
   phone: string;
   conditions: string[];
   lastVisit: string;
   status: string;
   statusTone: RosterStatusTone;
-  categories: PatientRosterCategory[];
+  encounterType: EncounterType;
+  encounterActive: boolean;
+  clinicalStatus: ClinicalStatus;
+  department: string;
+  location: string;
+  locationType: LocationType;
+  visitReason: string;
+  allergies: PatientAllergy[];
+  vitals: PatientVitals;
+  recentResults: PatientRecentResult[];
+  pending: PatientPendingItem[];
+  nextAppointment?: string;
+  ownership: PatientOwnership;
+  externalRecords?: boolean;
 }
 
 const patientRoster: RosterPatient[] = [
   {
     id: "rp-1", name: "Ibrar Ahmad", age: 31, gender: "Male", dob: "14 Mar 1995",
     avatar: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-004417", phone: "+92 300 4417220", conditions: ["GERD"],
-    lastVisit: "Today, 08:00", status: "Stable", statusTone: "success", categories: ["today"],
+    mrn: "MRN-2026-004417", patientIdCode: "PID-2026-00101", encounterNumber: "ENC-20260818-00101",
+    phone: "+92 300 4417220", conditions: ["GERD"], lastVisit: "Today, 08:00", status: "Stable", statusTone: "success",
+    encounterType: "OPD", encounterActive: true, clinicalStatus: "Stable", department: "Cardiology",
+    location: "OPD Room 4", locationType: "My Clinic", visitReason: "Stomach pain",
+    allergies: [{ substance: "Penicillin", reaction: "Anaphylaxis reported 2022" }],
+    vitals: { bp: "122/78", hr: 76, spo2: 98, temp: 36.7 }, recentResults: [], pending: [], ownership: "My Patients",
   },
   {
     id: "rp-2", name: "Fatima Sheikh", age: 35, gender: "Female", dob: "02 Jun 1991",
     avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-004892", phone: "+92 301 4892110", conditions: ["Migraine"],
-    lastVisit: "Today, 09:00", status: "Stable", statusTone: "success", categories: ["today", "chronic-care"],
+    mrn: "MRN-2026-004892", patientIdCode: "PID-2026-00102", encounterNumber: "ENC-20260818-00102",
+    phone: "+92 301 4892110", conditions: ["Migraine"], lastVisit: "Today, 09:00", status: "Stable", statusTone: "success",
+    encounterType: "OPD", encounterActive: true, clinicalStatus: "Stable", department: "Cardiology",
+    location: "OPD Room 4", locationType: "My Clinic", visitReason: "Headache follow-up",
+    allergies: [], vitals: { bp: "120/80", hr: 72, spo2: 99, temp: 36.6 },
+    recentResults: [{ name: "MRI Brain", value: "Normal", flag: "normal" }], pending: [], ownership: "My Patients",
   },
   {
     id: "rp-3", name: "Zara Malik", age: 41, gender: "Female", dob: "27 Nov 1984",
     avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-005103", phone: "+92 302 5103998", conditions: ["GERD"],
-    lastVisit: "Today, 10:00", status: "Stable", statusTone: "success", categories: ["today"],
+    mrn: "MRN-2026-005103", patientIdCode: "PID-2026-00103", encounterNumber: "ENC-20260818-00103",
+    phone: "+92 302 5103998", conditions: ["GERD"], lastVisit: "Today, 10:00", status: "Stable", statusTone: "success",
+    encounterType: "OPD", encounterActive: true, clinicalStatus: "Stable", department: "Cardiology",
+    location: "OPD Room 4", locationType: "My Clinic", visitReason: "Acid reflux",
+    allergies: [], vitals: { bp: "128/82", hr: 74, spo2: 98, temp: 36.8 }, recentResults: [], pending: [], ownership: "My Patients",
   },
   {
     id: "rp-4", name: "Ahsan Tariq", age: 29, gender: "Male", dob: "19 Feb 1997",
     avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-003318", phone: "+92 303 3318775", conditions: ["CKD Stage 3"],
-    lastVisit: "Today, 11:00", status: "On Consultation", statusTone: "info",
-    categories: ["today", "chronic-care", "high-risk"],
+    mrn: "MRN-2026-003318", patientIdCode: "PID-2026-00104", encounterNumber: "ENC-20260818-00104",
+    phone: "+92 303 3318775", conditions: ["CKD Stage 3"], lastVisit: "Today, 11:00", status: "On Consultation", statusTone: "info",
+    encounterType: "OPD", encounterActive: true, clinicalStatus: "High Risk", department: "Nephrology",
+    location: "OPD Room 4", locationType: "My Clinic", visitReason: "CKD monitoring",
+    allergies: [{ substance: "NSAIDs", reaction: "Worsens renal function — avoid" }],
+    vitals: { bp: "142/90", hr: 88, spo2: 96, temp: 37.0 },
+    recentResults: [{ name: "Serum Creatinine", value: "2.1 mg/dL", flag: "abnormal" }],
+    pending: [{ label: "Nephrology Referral Response", urgency: "routine" }],
+    nextAppointment: "22 Aug 2026, 09:00 AM", ownership: "My Patients",
   },
   {
     id: "rp-5", name: "Bilal Hussain", age: 45, gender: "Male", dob: "05 Sep 1980",
     avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-006220", phone: "+92 304 6220441", conditions: ["Stomach Pain"],
-    lastVisit: "Today, 13:00", status: "Upcoming", statusTone: "neutral", categories: ["today"],
+    mrn: "MRN-2026-006220", patientIdCode: "PID-2026-00105", encounterNumber: "ENC-20260818-00105",
+    phone: "+92 304 6220441", conditions: ["Stomach Pain"], lastVisit: "Today, 13:00", status: "Upcoming", statusTone: "neutral",
+    encounterType: "OPD", encounterActive: true, clinicalStatus: "Attention", department: "Cardiology",
+    location: "OPD Room 4", locationType: "My Clinic", visitReason: "Abdominal pain (new patient)",
+    allergies: [], vitals: { bp: "130/84", hr: 80, spo2: 97, temp: 36.9 }, recentResults: [],
+    pending: [{ label: "Initial Assessment", urgency: "routine" }], ownership: "My Patients",
   },
   {
     id: "rp-6", name: "Kamal Siddiqui", age: 38, gender: "Male", dob: "23 Jan 1988",
     avatar: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-004430", phone: "+92 305 4430229", conditions: ["Post-Concussion"],
-    lastVisit: "Today, 14:00", status: "Upcoming", statusTone: "neutral", categories: ["today"],
+    mrn: "MRN-2026-004430", patientIdCode: "PID-2026-00106", encounterNumber: "ENC-20260818-00106",
+    phone: "+92 305 4430229", conditions: ["Post-Concussion"], lastVisit: "Today, 14:00", status: "Upcoming", statusTone: "neutral",
+    encounterType: "OPD", encounterActive: true, clinicalStatus: "Stable", department: "Neurology",
+    location: "OPD Room 4", locationType: "My Clinic", visitReason: "Post-concussion follow-up",
+    allergies: [], vitals: { bp: "118/76", hr: 70, spo2: 99, temp: 36.6 }, recentResults: [], pending: [], ownership: "My Patients",
   },
   {
     id: "rp-7", name: "Noor Fatima", age: 31, gender: "Female", dob: "11 Jul 1995",
     avatar: "https://images.unsplash.com/photo-1601412436009-d964bd02edbc?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-005567", phone: "+92 306 5567113", conditions: ["Tension Headache"],
-    lastVisit: "Today, 15:00", status: "Upcoming", statusTone: "neutral", categories: ["today"],
+    mrn: "MRN-2026-005567", patientIdCode: "PID-2026-00107", encounterNumber: "ENC-20260818-00107",
+    phone: "+92 306 5567113", conditions: ["Tension Headache"], lastVisit: "Today, 15:00", status: "Upcoming", statusTone: "neutral",
+    encounterType: "Telemedicine", encounterActive: true, clinicalStatus: "Stable", department: "Cardiology",
+    location: "Video Consultation", locationType: "My Clinic", visitReason: "Tension headache (telemedicine)",
+    allergies: [], vitals: { bp: "116/74", hr: 68, spo2: 99, temp: 36.5 }, recentResults: [], pending: [], ownership: "My Patients",
   },
   {
     id: "rp-8", name: "Hamza Butt", age: 71, gender: "Male", dob: "08 Apr 1955",
     avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-007741", phone: "+92 300 1122334", conditions: ["Diabetes"],
-    lastVisit: "Jul 29, 2026", status: "Follow-Up Due", statusTone: "warning",
-    categories: ["follow-up-due", "chronic-care"],
+    mrn: "MRN-2026-007741", patientIdCode: "PID-2026-00108", encounterNumber: "ENC-20260729-00071",
+    phone: "+92 300 1122334", conditions: ["Diabetes"], lastVisit: "Jul 29, 2026", status: "Follow-Up Due", statusTone: "warning",
+    encounterType: "Follow-up", encounterActive: false, clinicalStatus: "Follow-up", department: "Endocrinology",
+    location: "N/A — Follow-up Due", locationType: "My Clinic", visitReason: "Diabetes review (missed)",
+    allergies: [], vitals: { bp: "138/86", hr: 82, spo2: 97, temp: 36.7 },
+    recentResults: [{ name: "HbA1c", value: "7.9%", flag: "abnormal" }],
+    pending: [{ label: "Diabetes Follow-up Visit", urgency: "routine" }], ownership: "Care Team",
   },
   {
     id: "rp-9", name: "Saira Cheema", age: 52, gender: "Female", dob: "16 Dec 1973",
     avatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-007902", phone: "+92 301 5566778", conditions: ["Hypertensive Crisis"],
-    lastVisit: "Aug 25, 2026", status: "Emergency Admit", statusTone: "critical",
-    categories: ["emergency", "high-risk"],
+    mrn: "MRN-2026-007902", patientIdCode: "PID-2026-00109", encounterNumber: "ENC-20260825-00301",
+    phone: "+92 301 5566778", conditions: ["Hypertensive Crisis"], lastVisit: "Aug 25, 2026", status: "Emergency Admit", statusTone: "critical",
+    encounterType: "Emergency", encounterActive: true, clinicalStatus: "Critical", department: "Cardiology",
+    location: "Emergency Bay 2", locationType: "Emergency", visitReason: "Hypertensive crisis",
+    allergies: [], vitals: { bp: "190/120", hr: 104, spo2: 95, temp: 37.2 }, recentResults: [],
+    pending: [{ label: "Troponin", urgency: "critical" }, { label: "Cardiology Consult Note", urgency: "abnormal" }],
+    ownership: "My Patients",
   },
   {
     id: "rp-10", name: "Omar Sethi", age: 58, gender: "Male", dob: "30 Aug 1967",
     avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-008015", phone: "+92 302 9988776", conditions: ["CKD Stage 3"],
-    lastVisit: "Jul 30, 2026", status: "Follow-Up Due", statusTone: "warning",
-    categories: ["follow-up-due", "chronic-care", "high-risk"],
+    mrn: "MRN-2026-008015", patientIdCode: "PID-2026-00110", encounterNumber: "ENC-20260730-00072",
+    phone: "+92 302 9988776", conditions: ["CKD Stage 3"], lastVisit: "Jul 30, 2026", status: "Follow-Up Due", statusTone: "warning",
+    encounterType: "Follow-up", encounterActive: false, clinicalStatus: "High Risk", department: "Nephrology",
+    location: "N/A — Follow-up Due", locationType: "My Clinic", visitReason: "CKD monitoring (missed)",
+    allergies: [{ substance: "Ibuprofen", reaction: "Nephrotoxic — contraindicated" }],
+    vitals: { bp: "148/92", hr: 84, spo2: 96, temp: 36.8 },
+    recentResults: [{ name: "eGFR", value: "42 mL/min", flag: "abnormal" }],
+    pending: [{ label: "Nephrology Follow-up", urgency: "routine" }],
+    nextAppointment: "28 Aug 2026, 11:00 AM", ownership: "Care Team",
   },
   {
     id: "rp-11", name: "Layla Awan", age: 44, gender: "Female", dob: "21 May 1981",
     avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-008220", phone: "+92 303 7743311", conditions: ["Hyperlipidemia"],
-    lastVisit: "Aug 12, 2026", status: "Follow-Up Due", statusTone: "warning",
-    categories: ["follow-up-due", "chronic-care"],
+    mrn: "MRN-2026-008220", patientIdCode: "PID-2026-00111", encounterNumber: "ENC-20260812-00081",
+    phone: "+92 303 7743311", conditions: ["Hyperlipidemia"], lastVisit: "Aug 12, 2026", status: "Follow-Up Due", statusTone: "warning",
+    encounterType: "Follow-up", encounterActive: false, clinicalStatus: "Attention", department: "Cardiology",
+    location: "N/A", locationType: "My Clinic", visitReason: "Lipid panel review",
+    allergies: [], vitals: { bp: "132/84", hr: 76, spo2: 98, temp: 36.7 },
+    recentResults: [{ name: "Cholesterol", value: "240 mg/dL", flag: "abnormal" }, { name: "Hemoglobin", value: "14.2 g/dL", flag: "normal" }],
+    pending: [{ label: "Statin Dose Review", urgency: "routine" }],
+    nextAppointment: "25 Aug 2026, 10:30 AM", ownership: "Department",
   },
   {
     id: "rp-12", name: "Rashid Qureshi", age: 36, gender: "Male", dob: "03 Oct 1989",
     avatar: "https://images.unsplash.com/photo-1615109398623-88346a601842?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-008349", phone: "+92 304 8812256", conditions: ["Post-Imaging Review"],
-    lastVisit: "Aug 10, 2026", status: "Stable", statusTone: "success", categories: [],
+    mrn: "MRN-2026-008349", patientIdCode: "PID-2026-00112", encounterNumber: "ENC-20260810-00082",
+    phone: "+92 304 8812256", conditions: ["Post-Imaging Review"], lastVisit: "Aug 10, 2026", status: "Stable", statusTone: "success",
+    encounterType: "Follow-up", encounterActive: false, clinicalStatus: "Stable", department: "General Medicine",
+    location: "N/A", locationType: "My Clinic", visitReason: "Chest X-ray review",
+    allergies: [], vitals: { bp: "118/78", hr: 72, spo2: 99, temp: 36.6 },
+    recentResults: [{ name: "Chest X-Ray", value: "Clear", flag: "normal" }], pending: [], ownership: "Department",
   },
   {
     id: "rp-13", name: "Amina Siddiqui", age: 29, gender: "Female", dob: "17 Feb 1997",
     avatar: "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-008477", phone: "+92 305 3345567", conditions: ["Hypothyroidism"],
-    lastVisit: "Aug 08, 2026", status: "Stable", statusTone: "success", categories: ["chronic-care"],
+    mrn: "MRN-2026-008477", patientIdCode: "PID-2026-00113", encounterNumber: "ENC-20260808-00083",
+    phone: "+92 305 3345567", conditions: ["Hypothyroidism"], lastVisit: "Aug 08, 2026", status: "Stable", statusTone: "success",
+    encounterType: "OPD", encounterActive: false, clinicalStatus: "Stable", department: "Endocrinology",
+    location: "N/A", locationType: "My Clinic", visitReason: "Thyroid check",
+    allergies: [], vitals: { bp: "116/74", hr: 70, spo2: 99, temp: 36.5 },
+    recentResults: [{ name: "TSH", value: "2.4 mIU/L", flag: "normal" }], pending: [], ownership: "Shared", externalRecords: true,
   },
   {
     id: "rp-14", name: "Mariam Farooq", age: 47, gender: "Female", dob: "09 Sep 1978",
     avatar: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-008590", phone: "+92 306 6654432", conditions: ["Fatty Liver Grade 1"],
-    lastVisit: "Aug 05, 2026", status: "Follow-Up Due", statusTone: "warning", categories: ["follow-up-due"],
+    mrn: "MRN-2026-008590", patientIdCode: "PID-2026-00114", encounterNumber: "ENC-20260805-00084",
+    phone: "+92 306 6654432", conditions: ["Fatty Liver Grade 1"], lastVisit: "Aug 05, 2026", status: "Follow-Up Due", statusTone: "warning",
+    encounterType: "Follow-up", encounterActive: false, clinicalStatus: "Attention", department: "Gastroenterology",
+    location: "N/A", locationType: "My Clinic", visitReason: "Abdominal ultrasound follow-up",
+    allergies: [], vitals: { bp: "124/80", hr: 74, spo2: 98, temp: 36.7 },
+    recentResults: [{ name: "Ultrasound", value: "Mild Steatosis", flag: "abnormal" }],
+    pending: [{ label: "Dietary Counseling Referral", urgency: "routine" }], ownership: "Consulted",
   },
   {
     id: "rp-15", name: "Hassan Abbasi", age: 62, gender: "Male", dob: "25 Jun 1963",
     avatar: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-008711", phone: "+92 300 9987654", conditions: ["Diabetes", "HbA1c Elevated"],
-    lastVisit: "Aug 02, 2026", status: "High-Risk", statusTone: "critical",
-    categories: ["chronic-care", "high-risk"],
+    mrn: "MRN-2026-008711", patientIdCode: "PID-2026-00115", encounterNumber: "ENC-20260802-00085",
+    phone: "+92 300 9987654", conditions: ["Diabetes", "HbA1c Elevated"], lastVisit: "Aug 02, 2026", status: "High-Risk", statusTone: "critical",
+    encounterType: "Follow-up", encounterActive: false, clinicalStatus: "Critical", department: "Endocrinology",
+    location: "N/A", locationType: "My Clinic", visitReason: "Diabetes progress review",
+    allergies: [{ substance: "Sulfa drugs", reaction: "Skin rash reported 2018" }],
+    vitals: { bp: "136/88", hr: 86, spo2: 96, temp: 36.9 },
+    recentResults: [{ name: "HbA1c", value: "6.8%", flag: "critical" }],
+    pending: [{ label: "Medication Adjustment", urgency: "abnormal" }, { label: "Note Awaiting Signature", urgency: "routine" }],
+    nextAppointment: "20 Aug 2026, 02:00 PM", ownership: "Care Team",
   },
   {
     id: "rp-16", name: "Elena Rodriguez", age: 39, gender: "Female", dob: "14 Jan 1987",
     avatar: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-008856", phone: "+92 301 2247890", conditions: ["Post-Cardiac Admission"],
-    lastVisit: "Admitted Aug 15, 2026", status: "IPD · Ward 3B", statusTone: "info", categories: ["ipd"],
+    mrn: "MRN-2026-008856", patientIdCode: "PID-2026-00116", encounterNumber: "ENC-20260815-00091",
+    phone: "+92 301 2247890", conditions: ["Post-Cardiac Admission"], lastVisit: "Admitted Aug 15, 2026", status: "IPD · Ward 3B", statusTone: "info",
+    encounterType: "IPD", encounterActive: true, clinicalStatus: "High Risk", department: "Cardiology",
+    location: "Ward 3B, Room 12, Bed A", locationType: "Ward", visitReason: "Post-cardiac admission",
+    allergies: [], vitals: { bp: "118/76", hr: 74, spo2: 97, temp: 36.8 }, recentResults: [],
+    pending: [{ label: "Cardiac Enzymes Recheck", urgency: "abnormal" }], ownership: "My Patients", externalRecords: true,
   },
   {
     id: "rp-17", name: "Usman Khan", age: 55, gender: "Male", dob: "11 Nov 1970",
     avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80",
-    mrn: "MRN-2026-008902", phone: "+92 302 8834521", conditions: ["Post-Operative Recovery"],
-    lastVisit: "Admitted Aug 16, 2026", status: "IPD · Post-Op", statusTone: "info", categories: ["ipd"],
+    mrn: "MRN-2026-008902", patientIdCode: "PID-2026-00117", encounterNumber: "ENC-20260816-00092",
+    phone: "+92 302 8834521", conditions: ["Post-Operative Recovery"], lastVisit: "Admitted Aug 16, 2026", status: "IPD · Post-Op", statusTone: "info",
+    encounterType: "IPD", encounterActive: true, clinicalStatus: "Stable", department: "General Surgery",
+    location: "Post-Op Ward, Room 5, Bed B", locationType: "Ward", visitReason: "Post-operative recovery",
+    allergies: [], vitals: { bp: "122/80", hr: 78, spo2: 98, temp: 37.0 }, recentResults: [],
+    pending: [{ label: "Wound Check", urgency: "routine" }], ownership: "Consulted", externalRecords: true,
   },
 ];
 

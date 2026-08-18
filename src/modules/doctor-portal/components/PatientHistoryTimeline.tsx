@@ -1,4 +1,4 @@
-import { Stethoscope, Activity, Pill, FlaskConical, FileText } from "lucide-react";
+import { Stethoscope, Activity, Pill, FlaskConical, FileText, ClipboardList } from "lucide-react";
 import type { HistoryEntryType, PatientHistoryEntry, RosterStatusTone } from "@modules/doctor-portal/api";
 
 interface PatientHistoryTimelineProps {
@@ -9,6 +9,7 @@ const TYPE_ICON: Record<HistoryEntryType, typeof Stethoscope> = {
   visit: Stethoscope,
   condition: Activity,
   medication: Pill,
+  order: ClipboardList,
   lab: FlaskConical,
   note: FileText,
 };
@@ -17,6 +18,7 @@ const TYPE_ICON_CLASSES: Record<HistoryEntryType, string> = {
   visit: "bg-blue-50 text-blue-600",
   condition: "bg-rose-50 text-rose-600",
   medication: "bg-violet-50 text-violet-600",
+  order: "bg-amber-50 text-amber-600",
   lab: "bg-emerald-50 text-emerald-600",
   note: "bg-slate-100 text-slate-500",
 };

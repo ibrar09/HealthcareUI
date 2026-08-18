@@ -336,7 +336,7 @@ const patientRoster: RosterPatient[] = [
 // separate typed entries per HMS_DOMAIN_STANDARDS rather than one generic
 // "history" text blob, then rendered as a single filterable timeline.
 
-export type HistoryEntryType = "visit" | "condition" | "medication" | "lab" | "note";
+export type HistoryEntryType = "visit" | "condition" | "medication" | "order" | "lab" | "note";
 
 export interface PatientHistoryEntry {
   id: string;
@@ -529,6 +529,17 @@ const patientHistories: Record<string, PatientHistory> = {
   },
 };
 
+// Adds a new entry to a patient's history. Rebuilds the history object and
+// its entries array as fresh references (never mutates in place) — mockRequest
+// returns the exact object it's given, and setState with an unchanged
+// reference makes React bail out of re-rendering (see mockRequest gotcha).
+function addHistoryEntry(patientId: string, entry: PatientHistoryEntry): PatientHistory {
+  const existing = patientHistories[patientId] ?? { patientId, allergies: [], entries: [] };
+  const updated: PatientHistory = { ...existing, entries: [entry, ...existing.entries] };
+  patientHistories[patientId] = updated;
+  return updated;
+}
+
 // --- Summary cards (spec §1 KPI row) ----------------------------------------
 
 export interface SummaryCardData {
@@ -586,4 +597,93 @@ export function completeConsultation(appointmentId: string) {
   const appt = doctorAppointments.find((a) => a.id === appointmentId);
   if (appt) appt.status = "attended";
   return mockRequest(appt ?? null);
+}
+
+// --- Clinical Workspace / Encounter (structured diagnosis/prescription/order authoring) ---
+// Diagnosis (Condition), prescription (MedicationRequest), and lab/imaging
+// order (ServiceRequest) are kept as separate typed inputs rather than one
+// generic "add to encounter" form — each is a different clinical object with
+// its own lifecycle, per the domain-model standard.
+
+export interface EncounterDiagnosisInput {
+  name: string;
+  status: "Active" | "Resolved" | "Chronic";
+  notes?: string;
+}
+
+export interface EncounterPrescriptionInput {
+  medication: string;
+  dosage: string;
+  frequency: string;
+  duration: string;
+  instructions?: string;
+}
+
+export type OrderUrgency = "Routine" | "Urgent" | "STAT";
+
+export interface EncounterOrderInput {
+  testName: string;
+  urgency: OrderUrgency;
+  instructions?: string;
+}
+
+export function addEncounterDiagnosis(patientId: string, input: EncounterDiagnosisInput) {
+  const entry: PatientHistoryEntry = {
+    id: `${patientId}-dx-${Date.now()}`,
+    type: "condition",
+    date: "Today",
+    title: input.name,
+    summary: input.notes?.trim() || `${input.status} diagnosis recorded during today's encounter.`,
+    meta: "Dr. Ayesha Raza",
+    tone: input.status === "Chronic" ? "critical" : input.status === "Active" ? "warning" : "success",
+  };
+  return mockRequest(addHistoryEntry(patientId, entry));
+}
+
+export function addEncounterPrescription(patientId: string, input: EncounterPrescriptionInput) {
+  const entry: PatientHistoryEntry = {
+    id: `${patientId}-rx-${Date.now()}`,
+    type: "medication",
+    date: "Today",
+    title: `${input.medication} — ${input.dosage}`,
+    summary: `${input.frequency}, ${input.duration}.${input.instructions ? ` ${input.instructions}` : ""}`,
+    meta: "Prescribed by Dr. Ayesha Raza",
+    tone: "info",
+  };
+  return mockRequest(addHistoryEntry(patientId, entry));
+}
+
+export function addEncounterOrder(patientId: string, input: EncounterOrderInput) {
+  const entry: PatientHistoryEntry = {
+    id: `${patientId}-ord-${Date.now()}`,
+    type: "order",
+    date: "Today",
+    title: input.testName,
+    summary: input.instructions?.trim() || `${input.urgency} order placed during today's encounter.`,
+    meta: `${input.urgency} · Ordered by Dr. Ayesha Raza`,
+    tone: input.urgency === "STAT" ? "critical" : input.urgency === "Urgent" ? "warning" : "info",
+  };
+  return mockRequest(addHistoryEntry(patientId, entry));
+}
+
+export function addEncounterNote(patientId: string, note: string) {
+  const entry: PatientHistoryEntry = {
+    id: `${patientId}-note-${Date.now()}`,
+    type: "note",
+    date: "Today",
+    title: "Encounter Note",
+    summary: note,
+    meta: "Dr. Ayesha Raza",
+  };
+  return mockRequest(addHistoryEntry(patientId, entry));
+}
+
+export function finishEncounter(patientId: string, appointmentId?: string) {
+  if (appointmentId) {
+    const appt = doctorAppointments.find((a) => a.id === appointmentId);
+    if (appt) appt.status = "attended";
+  }
+  const patient = patientRoster.find((p) => p.id === patientId);
+  if (patient) patient.lastVisit = "Today";
+  return mockRequest(patientHistories[patientId] ?? null);
 }

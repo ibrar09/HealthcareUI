@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Phone, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Phone, AlertTriangle, Stethoscope } from "lucide-react";
 import { DoctorLayout } from "@/layouts/DoctorLayout";
 import { PatientHistoryTimeline } from "@modules/doctor-portal/components/PatientHistoryTimeline";
 import { ROUTES } from "@/constants/routes";
@@ -12,6 +12,7 @@ const TYPE_CHIPS: { key: HistoryEntryType | "all"; label: string }[] = [
   { key: "visit", label: "Visits" },
   { key: "condition", label: "Diagnoses" },
   { key: "medication", label: "Medications" },
+  { key: "order", label: "Orders" },
   { key: "lab", label: "Labs" },
   { key: "note", label: "Notes" },
 ];
@@ -92,6 +93,13 @@ export function PatientDetail() {
                   </div>
                 </div>
               </div>
+              <button
+                type="button"
+                onClick={() => navigate(ROUTES.DOCTOR.ENCOUNTER(patient.id))}
+                className="flex items-center gap-1.5 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2.5 rounded-xl transition-colors shadow-sm shadow-blue-500/30 flex-shrink-0"
+              >
+                <Stethoscope className="w-3.5 h-3.5" /> Start Encounter
+              </button>
             </div>
 
             {history && history.allergies.length > 0 && (

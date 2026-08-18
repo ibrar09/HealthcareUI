@@ -45,7 +45,13 @@ export function OngoingConsultationCard({ patient, onSaveNotes, onFinish }: Ongo
             </span>
           )}
         </div>
-        <button type="button" className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50" aria-label="Expand">
+        <button
+          type="button"
+          onClick={() => patient.patientId && navigate(`${ROUTES.DOCTOR.ENCOUNTER(patient.patientId)}?appointmentId=${patient.id}`)}
+          className="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-50"
+          aria-label="Open full Encounter Workspace"
+          title="Open full Encounter Workspace"
+        >
           <Maximize2 className="w-4 h-4" />
         </button>
       </div>

@@ -1,11 +1,12 @@
 import { RouteObject } from "react-router-dom";
+import { NurseSignIn } from "./pages/NurseSignIn";
 
 /**
- * Nursing / IPD module routes — registered under /nursing-ipd/* in the root router.
- * STATUS: not yet built. Add screens as pages/*.tsx files and register
- * them here. See src/modules/doctor-portal/ for the reference pattern
+ * Nursing / IPD module routes — registered under /nursing/* in the root
+ * router. See src/modules/doctor-portal/ for the reference pattern
  * (routes.tsx, pages/, api/, components/).
  */
 export const nursingipdRoutes: RouteObject[] = [
-  // { path: "sign-in", element: <SignIn /> },
+  { path: "sign-in", element: <NurseSignIn /> },
+  // ...add remaining Nursing Portal screens here as built
 ];

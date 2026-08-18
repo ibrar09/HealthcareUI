@@ -57,6 +57,7 @@ export const ROUTES = {
   },
   NURSING: {
     SIGN_IN: "/nursing/sign-in",
+    DASHBOARD: "/nursing/dashboard",
   },
   EMERGENCY: {
     SIGN_IN: "/emergency/sign-in",

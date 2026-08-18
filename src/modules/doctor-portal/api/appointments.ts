@@ -147,6 +147,12 @@ const appointments: Appointment[] = [
     priority: "Routine", reason: "Thyroid follow-up", status: "Requested", preferredWindow: "Morning",
     preVisit: { questionnaireComplete: false, insuranceVerified: false, previousRecordsAvailable: true, recentLabsAvailable: true },
   },
+  {
+    id: "APT-20260826-00202", patientId: "rp-8", date: "2026-08-26", displayDate: "26 Aug 2026", time: "", duration: 20,
+    department: "Endocrinology", location: "OPD Room 4", encounterType: "OPD", visitType: "Chronic Disease Review", isNewPatient: false,
+    priority: "Urgent", reason: "Diabetes follow-up after missed appointment", status: "Requested", preferredWindow: "Afternoon",
+    preVisit: { questionnaireComplete: false, insuranceVerified: true, previousRecordsAvailable: true, recentLabsAvailable: true },
+  },
 ];
 
 function refreshedList() {
@@ -160,6 +166,12 @@ export const getAppointments = () => mockRequest(refreshedList());
 export const getAppointmentsByDate = (date: string) => mockRequest(appointments.filter((a) => a.date === date));
 export const getAppointment = (id: string) => mockRequest(appointments.find((a) => a.id === id) ?? null);
 export const getAppointmentsByPatient = (patientId: string) => mockRequest(appointments.filter((a) => a.patientId === patientId));
+
+// Requests don't belong to "today" or any specific date the doctor happens
+// to be browsing in List view — a patient's requested appointment can carry
+// a tentative future date with no confirmed time, so it needs its own
+// cross-date lookup rather than getAppointmentsByDate.
+export const getRequestedAppointments = () => mockRequest(appointments.filter((a) => a.status === "Requested"));
 
 export interface AppointmentSummary {
   today: number;

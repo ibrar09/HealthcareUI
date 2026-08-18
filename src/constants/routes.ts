@@ -12,6 +12,7 @@ export const ROUTES = {
     ENCOUNTER: (patientId: string) => `/doctor/encounter/${patientId}`,
     APPOINTMENTS: "/doctor/appointments",
     QUEUE: "/doctor/queue",
+    REQUESTS: "/doctor/requests",
     SCHEDULE: "/doctor/schedule",
     MESSAGES: "/doctor/messages",
   },

@@ -11,6 +11,8 @@ import type {
 interface BookAppointmentModalProps {
   roster: RosterPatient[];
   defaultDate: string;
+  initialPatientId?: string;
+  initialReason?: string;
   onClose: () => void;
   onConfirm: (input: NewAppointmentInput) => void;
 }
@@ -25,8 +27,8 @@ const PRIORITIES: AppointmentPriority[] = ["Routine", "Urgent", "High Priority",
 const inputClass = "w-full text-xs border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100";
 
 /** Module-local — the "+ Book Appointment" form: picks an existing roster patient rather than creating a new one. */
-export function BookAppointmentModal({ roster, defaultDate, onClose, onConfirm }: BookAppointmentModalProps) {
-  const [patientId, setPatientId] = useState(roster[0]?.id ?? "");
+export function BookAppointmentModal({ roster, defaultDate, initialPatientId, initialReason, onClose, onConfirm }: BookAppointmentModalProps) {
+  const [patientId, setPatientId] = useState(initialPatientId ?? roster[0]?.id ?? "");
   const [date, setDate] = useState(defaultDate);
   const [time, setTime] = useState("09:00");
   const [duration, setDuration] = useState(20);
@@ -36,7 +38,7 @@ export function BookAppointmentModal({ roster, defaultDate, onClose, onConfirm }
   const [visitType, setVisitType] = useState<VisitType>("Follow-up");
   const [isNewPatient, setIsNewPatient] = useState(false);
   const [priority, setPriority] = useState<AppointmentPriority>("Routine");
-  const [reason, setReason] = useState("");
+  const [reason, setReason] = useState(initialReason ?? "");
 
   const [workingHours, setWorkingHours] = useState<DayHours[]>([]);
   const [blockedTimes, setBlockedTimes] = useState<BlockedTime[]>([]);

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, ListChecks, LayoutList, CalendarRange } from "lucide-react";
+import { Plus, ListChecks, LayoutList, CalendarRange, Inbox } from "lucide-react";
 import { DoctorLayout } from "@/layouts/DoctorLayout";
 import { ROUTES } from "@/constants/routes";
 import { AppointmentDashboardStats } from "@modules/doctor-portal/components/AppointmentDashboardStats";
@@ -51,6 +51,7 @@ export function Appointments() {
   const [dayAppointments, setDayAppointments] = useState<Appointment[]>([]);
   const [todaysAppointments, setTodaysAppointments] = useState<Appointment[]>([]);
   const [allAppointments, setAllAppointments] = useState<Appointment[]>([]);
+  const [requestCount, setRequestCount] = useState(0);
 
   const [viewMode, setViewMode] = useState<"list" | "calendar">("list");
   const [calendarGranularity, setCalendarGranularity] = useState<CalendarGranularity>("month");
@@ -77,11 +78,15 @@ export function Appointments() {
   function refreshCalendar() {
     api.getAppointments().then(setAllAppointments);
   }
+  function refreshRequests() {
+    api.getRequestedAppointments().then((r) => setRequestCount(r.length));
+  }
   function refreshAll() {
     refreshDay();
     refreshSummary();
     refreshToday();
     refreshCalendar();
+    refreshRequests();
   }
 
   useEffect(() => {
@@ -90,6 +95,7 @@ export function Appointments() {
     refreshSummary();
     refreshToday();
     refreshCalendar();
+    refreshRequests();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -136,6 +142,16 @@ export function Appointments() {
       <div className="flex items-center justify-between mb-5 flex-wrap gap-3">
         <h1 className="text-xl font-bold text-slate-800">Appointments</h1>
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => navigate(ROUTES.DOCTOR.REQUESTS)}
+            className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 rounded-xl px-4 py-2.5"
+          >
+            <Inbox className="w-3.5 h-3.5" /> Requests
+            {requestCount > 0 && (
+              <span className="w-4 h-4 rounded-full bg-blue-600 text-white text-[10px] font-bold flex items-center justify-center">{requestCount}</span>
+            )}
+          </button>
           <button
             type="button"
             onClick={() => navigate(ROUTES.DOCTOR.QUEUE)}

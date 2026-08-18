@@ -8,6 +8,7 @@ import { Appointments } from "./pages/Appointments";
 import { Schedule } from "./pages/Schedule";
 import { Messages } from "./pages/Messages";
 import { Queue } from "./pages/Queue";
+import { Requests } from "./pages/Requests";
 
 /**
  * This module's own routes, registered under /doctor/* in the root router.
@@ -26,5 +27,6 @@ export const doctorPortalRoutes: RouteObject[] = [
   { path: "schedule", element: <Schedule /> },
   { path: "messages", element: <Messages /> },
   { path: "queue", element: <Queue /> },
+  { path: "requests", element: <Requests /> },
   // ...add remaining Doctor Portal screens here as built
 ];

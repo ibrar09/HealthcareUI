@@ -9,6 +9,7 @@ export * from "./schedule";
 export * from "./messages";
 export * from "./waitlist";
 export * from "./earnings";
+export * from "./formulary";
 
 // Module-local sample data — only Doctor Portal screens use this file.
 // Patient identities/geography/MRN format deliberately match Hospital

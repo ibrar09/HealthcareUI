@@ -3,9 +3,10 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Activity, Pill, ClipboardList, CheckCircle2 } from "lucide-react";
 import { DoctorLayout } from "@/layouts/DoctorLayout";
 import { EncounterSectionCard, EncounterAddButton } from "@modules/doctor-portal/components/EncounterSectionCard";
+import { StockStatusBadge } from "@modules/doctor-portal/components/StockStatusBadge";
 import { ROUTES } from "@/constants/routes";
 import * as api from "@modules/doctor-portal/api";
-import type { RosterPatient, PatientHistoryEntry, OrderUrgency } from "@modules/doctor-portal/api";
+import type { RosterPatient, PatientHistoryEntry, OrderUrgency, MedicationStock } from "@modules/doctor-portal/api";
 
 const inputClass = "w-full text-xs border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-100";
 
@@ -38,6 +39,8 @@ export function EncounterWorkspace() {
   const [ordUrgency, setOrdUrgency] = useState<OrderUrgency>("Routine");
   const [ordInstructions, setOrdInstructions] = useState("");
 
+  const [formulary, setFormulary] = useState<MedicationStock[]>([]);
+
   useEffect(() => {
     if (!patientId) return;
     api.getRosterPatient(patientId).then((p) => {
@@ -45,6 +48,16 @@ export function EncounterWorkspace() {
       setLoading(false);
     });
   }, [patientId]);
+
+  useEffect(() => {
+    api.getFormulary().then(setFormulary);
+  }, []);
+
+  const matchedMedication = useMemo(() => {
+    const query = rxMedication.trim().toLowerCase();
+    if (!query) return null;
+    return formulary.find((m) => m.name.toLowerCase().includes(query) || m.genericName.toLowerCase().includes(query)) ?? null;
+  }, [rxMedication, formulary]);
 
   const canFinish = useMemo(
     () => diagnoses.length > 0 || prescriptions.length > 0 || orders.length > 0 || notesText.trim().length > 0,
@@ -163,6 +176,14 @@ export function EncounterWorkspace() {
               form={
                 <div className="flex flex-col gap-2">
                   <input className={inputClass} placeholder="Medication" value={rxMedication} onChange={(e) => setRxMedication(e.target.value)} />
+                  {matchedMedication && (
+                    <div className="flex items-center justify-between gap-2 -mt-1">
+                      <StockStatusBadge status={matchedMedication.stockStatus} />
+                      {matchedMedication.stockStatus !== "In Stock" && matchedMedication.alternatives && (
+                        <span className="text-[10px] text-slate-400 truncate">Try: {matchedMedication.alternatives.join(", ")}</span>
+                      )}
+                    </div>
+                  )}
                   <div className="grid grid-cols-2 gap-2">
                     <input className={inputClass} placeholder="Dosage (e.g. 500mg)" value={rxDosage} onChange={(e) => setRxDosage(e.target.value)} />
                     <input className={inputClass} placeholder="Frequency" value={rxFrequency} onChange={(e) => setRxFrequency(e.target.value)} />

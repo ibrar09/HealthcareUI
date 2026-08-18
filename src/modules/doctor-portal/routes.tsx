@@ -10,6 +10,7 @@ import { Messages } from "./pages/Messages";
 import { Queue } from "./pages/Queue";
 import { Requests } from "./pages/Requests";
 import { Payment } from "./pages/Payment";
+import { ProductStock } from "./pages/ProductStock";
 
 /**
  * This module's own routes, registered under /doctor/* in the root router.
@@ -30,5 +31,6 @@ export const doctorPortalRoutes: RouteObject[] = [
   { path: "queue", element: <Queue /> },
   { path: "requests", element: <Requests /> },
   { path: "payment", element: <Payment /> },
+  { path: "product-stock", element: <ProductStock /> },
   // ...add remaining Doctor Portal screens here as built
 ];

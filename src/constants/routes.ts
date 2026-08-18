@@ -10,6 +10,7 @@ export const ROUTES = {
     PATIENTS: "/doctor/patients",
     PATIENT_DETAIL: (id: string) => `/doctor/patients/${id}`,
     ENCOUNTER: (patientId: string) => `/doctor/encounter/${patientId}`,
+    APPOINTMENTS: "/doctor/appointments",
   },
   HOSPITAL_ADMIN: {
     SIGN_IN: "/hospital-admin/sign-in",

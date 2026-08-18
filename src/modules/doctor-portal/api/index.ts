@@ -1,6 +1,11 @@
 import { mockRequest } from "@shared/lib/api/client";
 import type { Patient, Doctor } from "@shared/types/domain";
 
+// Appointments live in their own file (appointments.ts imports EncounterType
+// from here, type-only, so this re-export doesn't create a runtime cycle —
+// see that file's own header comment for why it's a separate dataset).
+export * from "./appointments";
+
 // Module-local sample data — only Doctor Portal screens use this file.
 // Patient identities/geography/MRN format deliberately match Hospital
 // Admin's own seed data (Lahore-based, MRN-2026-###### convention) rather

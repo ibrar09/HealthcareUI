@@ -29,7 +29,7 @@ export function DoctorLayout({ active, children }: DoctorLayoutProps) {
 
   const navItems = [
     { label: "Overview", icon: <LayoutGrid size={18} />, active: active === "Overview", onClick: () => navigate(ROUTES.DOCTOR.DASHBOARD) },
-    { label: "Appointments", icon: <CalendarDays size={18} />, active: active === "Appointments" },
+    { label: "Appointments", icon: <CalendarDays size={18} />, active: active === "Appointments", onClick: () => navigate(ROUTES.DOCTOR.APPOINTMENTS) },
     { label: "Messages", icon: <MessageSquare size={18} />, active: active === "Messages", badge: 3 },
     { label: "Patients", icon: <Users size={18} />, active: active === "Patients", onClick: () => navigate(ROUTES.DOCTOR.PATIENTS) },
     { label: "Schedules", icon: <Clock size={18} />, active: active === "Schedules" },

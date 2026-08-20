@@ -264,25 +264,26 @@ function RailShell({
               <button
                 key={item.label}
                 type="button"
+                title={item.label}
                 onClick={item.onClick}
                 className={clsx(
-                  "w-full flex items-center justify-between px-3 py-2.5 text-sm rounded-lg transition-colors mt-1",
+                  "w-full flex items-center justify-between gap-2 px-3 py-2.5 text-sm rounded-lg transition-colors mt-1",
                   item.active
                     ? "font-semibold"
                     : "font-medium text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface"
                 )}
                 style={item.active ? { backgroundColor: "var(--signal-indigo-tint)", color: accentColor } : undefined}
               >
-                <span className="flex items-center gap-3">
+                <span className="flex items-center gap-3 min-w-0">
                   {item.icon}
-                  {item.label}
+                  <span className="truncate">{item.label}</span>
                 </span>
                 {item.badge !== undefined ? (
-                  <span className="bg-surface-container-low text-on-surface-variant text-xs py-0.5 px-2 rounded-full">
+                  <span className="bg-surface-container-low text-on-surface-variant text-xs py-0.5 px-2 rounded-full flex-shrink-0">
                     {item.badge}
                   </span>
                 ) : (
-                  <ChevronRight size={12} className={item.active ? "" : "text-outline-variant"} style={item.active ? { color: accentColor } : undefined} />
+                  <ChevronRight size={12} className={clsx("flex-shrink-0", !item.active && "text-outline-variant")} style={item.active ? { color: accentColor } : undefined} />
                 )}
               </button>
             )
